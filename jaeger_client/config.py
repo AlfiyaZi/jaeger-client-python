@@ -395,7 +395,7 @@ class Config(object):
         if self.logging:
             reporter = CompositeReporter(reporter, LoggingReporter(logger))
 
-        if not self.throttler_group() is None:
+        if self.throttler_group() is not None:
             throttler = RemoteThrottler(
                 channel,
                 self.service_name,

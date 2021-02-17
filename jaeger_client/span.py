@@ -124,14 +124,15 @@ class Span(opentracing.Span):
 
     def log_kv(self, key_values, timestamp=None):
         if self.is_sampled():
-            timestamp = timestamp if timestamp else time.time()
+            timestamp = timestamp or time.time()
             # TODO handle exception logging, 'python.exception.type' etc.
             log = thrift.make_log(
-                timestamp=timestamp if timestamp else time.time(),
+                timestamp=timestamp or time.time(),
                 fields=key_values,
                 max_length=self._tracer.max_tag_value_length,
                 max_traceback_length=self._tracer.max_traceback_length,
             )
+
             with self.update_lock:
                 self.logs.append(log)
         return self
@@ -165,8 +166,11 @@ class Span(opentracing.Span):
     def is_rpc(self):
         for tag in self.tags:
             if tag.key == ext_tags.SPAN_KIND:
-                return tag.vStr == ext_tags.SPAN_KIND_RPC_CLIENT or \
-                    tag.vStr == ext_tags.SPAN_KIND_RPC_SERVER
+                return tag.vStr in [
+                    ext_tags.SPAN_KIND_RPC_CLIENT,
+                    ext_tags.SPAN_KIND_RPC_SERVER,
+                ]
+
         return False
 
     def is_rpc_client(self):

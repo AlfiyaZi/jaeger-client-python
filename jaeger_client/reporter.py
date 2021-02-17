@@ -67,7 +67,7 @@ class InMemoryReporter(NullReporter):
 class LoggingReporter(NullReporter):
     """Logs all spans."""
     def __init__(self, logger=None):
-        self.logger = logger if logger else default_logger
+        self.logger = logger or default_logger
 
     def report_span(self, span):
         self.logger.info('Reporting span %s', span)

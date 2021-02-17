@@ -103,22 +103,23 @@ class Client(Iface):
 class Processor(Iface, TProcessor):
   def __init__(self, handler):
     self._handler = handler
-    self._processMap = {}
-    self._processMap["getSamplingStrategy"] = Processor.process_getSamplingStrategy
+    self._processMap = {
+        "getSamplingStrategy": Processor.process_getSamplingStrategy
+    }
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
-    if name not in self._processMap:
-      iprot.skip(TType.STRUCT)
-      iprot.readMessageEnd()
-      x = TApplicationException(TApplicationException.UNKNOWN_METHOD, 'Unknown function %s' % (name))
-      oprot.writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
-      x.write(oprot)
-      oprot.writeMessageEnd()
-      oprot.trans.flush()
-      return
-    else:
+    if name in self._processMap:
       return self._processMap[name](self, seqid, iprot, oprot)
+
+    iprot.skip(TType.STRUCT)
+    iprot.readMessageEnd()
+    x = TApplicationException(TApplicationException.UNKNOWN_METHOD, 'Unknown function %s' % (name))
+    oprot.writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
+    x.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+    return
 
   @gen.coroutine
   def process_getSamplingStrategy(self, seqid, iprot, oprot):
@@ -158,11 +159,8 @@ class getSamplingStrategy_args(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.STRING:
-          self.serviceName = iprot.readString()
-        else:
-          iprot.skip(ftype)
+      if fid == 1 and ftype == TType.STRING:
+        self.serviceName = iprot.readString()
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -222,12 +220,9 @@ class getSamplingStrategy_result(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 0:
-        if ftype == TType.STRUCT:
-          self.success = SamplingStrategyResponse()
-          self.success.read(iprot)
-        else:
-          iprot.skip(ftype)
+      if fid == 0 and ftype == TType.STRUCT:
+        self.success = SamplingStrategyResponse()
+        self.success.read(iprot)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()

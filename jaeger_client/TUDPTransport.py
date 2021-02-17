@@ -30,10 +30,7 @@ class TUDPTransport(TTransportBase, object):
         self.transport_host = host
         self.transport_port = port
         self.transport_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        if blocking:
-            blocking = 1
-        else:
-            blocking = 0
+        blocking = 1 if blocking else 0
         self.transport_sock.setblocking(blocking)
 
     def write(self, buf):

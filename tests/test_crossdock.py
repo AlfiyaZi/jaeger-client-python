@@ -82,26 +82,30 @@ def test_trace_propagation(
         )
     )
 
-    level3 = dict()
-    level3['serviceName'] = 'python'
-    level3['serverRole'] = 's3'
-    level3['transport'] = s3_transport
-    level3['host'] = 'localhost'
-    level3['port'] = str(http_port) if s3_transport == 'HTTP' else tchannel_port
+    level3 = {
+        'serviceName': 'python',
+        'serverRole': 's3',
+        'transport': s3_transport,
+        'host': 'localhost',
+        'port': str(http_port) if s3_transport == 'HTTP' else tchannel_port,
+    }
 
-    level2 = dict()
-    level2['serviceName'] = 'python'
-    level2['serverRole'] = 's2'
-    level2['transport'] = s2_transport
-    level2['host'] = 'localhost'
-    level2['port'] = str(http_port) if s2_transport == 'HTTP' else tchannel_port
-    level2['downstream'] = level3
+    level2 = {
+        'serviceName': 'python',
+        'serverRole': 's2',
+        'transport': s2_transport,
+        'host': 'localhost',
+        'port': str(http_port) if s2_transport == 'HTTP' else tchannel_port,
+        'downstream': level3,
+    }
 
-    level1 = dict()
-    level1['baggage'] = 'Zoidberg'
-    level1['serverRole'] = 's1'
-    level1['sampled'] = sampled
-    level1['downstream'] = level2
+    level1 = {
+        'baggage': 'Zoidberg',
+        'serverRole': 's1',
+        'sampled': sampled,
+        'downstream': level2,
+    }
+
     body = json.dumps(level1)
 
     with mock.patch('opentracing.tracer', tracer):
@@ -134,10 +138,7 @@ def test_trace_propagation(
 @pytest.mark.gen_test
 @pytest.mark.skipif(six.PY3, reason='crossdock tests need tchannel that only works with Python 2.7')
 def test_endtoend_handler(tracer):
-    payload = dict()
-    payload['operation'] = 'Zoidberg'
-    payload['count'] = 2
-    payload['tags'] = {'key': 'value'}
+    payload = {'operation': 'Zoidberg', 'count': 2, 'tags': {'key': 'value'}}
     body = json.dumps(payload)
 
     h = EndToEndHandler()

@@ -103,22 +103,21 @@ class Client(Iface):
 class Processor(Iface, TProcessor):
   def __init__(self, handler):
     self._handler = handler
-    self._processMap = {}
-    self._processMap["submitBatches"] = Processor.process_submitBatches
+    self._processMap = {"submitBatches": Processor.process_submitBatches}
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
-    if name not in self._processMap:
-      iprot.skip(TType.STRUCT)
-      iprot.readMessageEnd()
-      x = TApplicationException(TApplicationException.UNKNOWN_METHOD, 'Unknown function %s' % (name))
-      oprot.writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
-      x.write(oprot)
-      oprot.writeMessageEnd()
-      oprot.trans.flush()
-      return
-    else:
+    if name in self._processMap:
       return self._processMap[name](self, seqid, iprot, oprot)
+
+    iprot.skip(TType.STRUCT)
+    iprot.readMessageEnd()
+    x = TApplicationException(TApplicationException.UNKNOWN_METHOD, 'Unknown function %s' % (name))
+    oprot.writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
+    x.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+    return
 
   @gen.coroutine
   def process_submitBatches(self, seqid, iprot, oprot):
@@ -158,17 +157,14 @@ class submitBatches_args(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.LIST:
-          self.batches = []
-          (_etype45, _size42) = iprot.readListBegin()
-          for _i46 in xrange(_size42):
-            _elem47 = Batch()
-            _elem47.read(iprot)
-            self.batches.append(_elem47)
-          iprot.readListEnd()
-        else:
-          iprot.skip(ftype)
+      if fid == 1 and ftype == TType.LIST:
+        self.batches = []
+        (_etype45, _size42) = iprot.readListBegin()
+        for _i46 in xrange(_size42):
+          _elem47 = Batch()
+          _elem47.read(iprot)
+          self.batches.append(_elem47)
+        iprot.readListEnd()
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -231,17 +227,14 @@ class submitBatches_result(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 0:
-        if ftype == TType.LIST:
-          self.success = []
-          (_etype52, _size49) = iprot.readListBegin()
-          for _i53 in xrange(_size49):
-            _elem54 = BatchSubmitResponse()
-            _elem54.read(iprot)
-            self.success.append(_elem54)
-          iprot.readListEnd()
-        else:
-          iprot.skip(ftype)
+      if fid == 0 and ftype == TType.LIST:
+        self.success = []
+        (_etype52, _size49) = iprot.readListBegin()
+        for _i53 in xrange(_size49):
+          _elem54 = BatchSubmitResponse()
+          _elem54.read(iprot)
+          self.success.append(_elem54)
+        iprot.readListEnd()
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()

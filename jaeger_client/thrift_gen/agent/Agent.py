@@ -110,23 +110,24 @@ class Client(Iface):
 class Processor(Iface, TProcessor):
   def __init__(self, handler):
     self._handler = handler
-    self._processMap = {}
-    self._processMap["emitZipkinBatch"] = Processor.process_emitZipkinBatch
-    self._processMap["emitBatch"] = Processor.process_emitBatch
+    self._processMap = {
+        "emitZipkinBatch": Processor.process_emitZipkinBatch,
+        "emitBatch": Processor.process_emitBatch,
+    }
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
-    if name not in self._processMap:
-      iprot.skip(TType.STRUCT)
-      iprot.readMessageEnd()
-      x = TApplicationException(TApplicationException.UNKNOWN_METHOD, 'Unknown function %s' % (name))
-      oprot.writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
-      x.write(oprot)
-      oprot.writeMessageEnd()
-      oprot.trans.flush()
-      return
-    else:
+    if name in self._processMap:
       return self._processMap[name](self, seqid, iprot, oprot)
+
+    iprot.skip(TType.STRUCT)
+    iprot.readMessageEnd()
+    x = TApplicationException(TApplicationException.UNKNOWN_METHOD, 'Unknown function %s' % (name))
+    oprot.writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
+    x.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+    return
 
   @gen.coroutine
   def process_emitZipkinBatch(self, seqid, iprot, oprot):
@@ -168,17 +169,14 @@ class emitZipkinBatch_args(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.LIST:
-          self.spans = []
-          (_etype3, _size0) = iprot.readListBegin()
-          for _i4 in xrange(_size0):
-            _elem5 = zipkincore.ttypes.Span()
-            _elem5.read(iprot)
-            self.spans.append(_elem5)
-          iprot.readListEnd()
-        else:
-          iprot.skip(ftype)
+      if fid == 1 and ftype == TType.LIST:
+        self.spans = []
+        (_etype3, _size0) = iprot.readListBegin()
+        for _i4 in xrange(_size0):
+          _elem5 = zipkincore.ttypes.Span()
+          _elem5.read(iprot)
+          self.spans.append(_elem5)
+        iprot.readListEnd()
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -242,12 +240,9 @@ class emitBatch_args(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.STRUCT:
-          self.batch = jaeger.ttypes.Batch()
-          self.batch.read(iprot)
-        else:
-          iprot.skip(ftype)
+      if fid == 1 and ftype == TType.STRUCT:
+        self.batch = jaeger.ttypes.Batch()
+        self.batch.read(iprot)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()

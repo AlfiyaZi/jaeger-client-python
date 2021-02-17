@@ -311,19 +311,13 @@ class JoinTraceRequest(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.STRING:
-          self.serverRole = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.STRUCT:
-          self.downstream = Downstream()
-          self.downstream.read(iprot)
-        else:
-          iprot.skip(ftype)
-      else:
+      if fid == 1 and ftype == TType.STRING:
+        self.serverRole = iprot.readString()
+      elif ftype != TType.STRUCT or fid != 2:
         iprot.skip(ftype)
+      else:
+        self.downstream = Downstream()
+        self.downstream.read(iprot)
       iprot.readFieldEnd()
     iprot.readStructEnd()
 

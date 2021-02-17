@@ -29,10 +29,7 @@ class PrometheusMetricsFactory(MetricsFactory):
     def _get_tag_name_list(self, tags):
         if tags is None:
             return []
-        tag_name_list = []
-        for key in tags.keys():
-            tag_name_list.append(key)
-        return tag_name_list
+        return [key for key in tags.keys()]
 
     def _get_metric(self, metricType, name, tags):
         if self._service_name_label:

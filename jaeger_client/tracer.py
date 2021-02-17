@@ -157,12 +157,13 @@ class Tracer(opentracing.Tracer):
 
         valid_references = None
         if references:
-            valid_references = list()
             if not isinstance(references, list):
                 references = [references]
-            for reference in references:
-                if reference.referenced_context is not None:
-                    valid_references.append(reference)
+            valid_references = [
+                reference
+                for reference in references
+                if reference.referenced_context is not None
+            ]
 
         # setting first reference as parent
         if valid_references and (parent is None or not parent.has_trace):

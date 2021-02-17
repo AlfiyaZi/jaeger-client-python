@@ -200,9 +200,9 @@ def test_serialization(tracer, inject_mode):
 
 
 def test_serialization_error(tracer):
-    span = 'span'
-    carrier = {}
     with pytest.raises(ValueError):
+        span = 'span'
+        carrier = {}
         tracer.inject(
             span_context=span, format=Format.TEXT_MAP, carrier=carrier
         )
@@ -287,12 +287,12 @@ def test_tracer_tags_on_root_span(span_type, expected_tags):
 def test_tracer_override_codecs():
     reporter = mock.MagicMock()
     sampler = ConstSampler(True)
-    codecs = {
-        'extra_codec': 'codec_placeholder',
-        Format.BINARY: 'overridden_binary_codec'
-
-    }
     with mock.patch('socket.gethostname', return_value='dream-host.com'):
+        codecs = {
+            'extra_codec': 'codec_placeholder',
+            Format.BINARY: 'overridden_binary_codec'
+
+        }
         tracer = Tracer(service_name='x', reporter=reporter, sampler=sampler,
                         extra_codecs=codecs)
         assert tracer.codecs['extra_codec'] == 'codec_placeholder',\

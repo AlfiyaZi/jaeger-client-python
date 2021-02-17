@@ -28,7 +28,7 @@ def test_rate_limiting_sampler():
     ts = time.time()
     rate_limiter.last_tick = ts
     with mock.patch('jaeger_client.rate_limiter.RateLimiter.timestamp') \
-            as mock_time:
+                as mock_time:
         mock_time.side_effect = lambda: ts  # always return same time
         assert rate_limiter.timestamp() == ts
         assert rate_limiter.check_credit(1), 'initial balance allows first item'
@@ -50,7 +50,7 @@ def test_rate_limiting_sampler():
         mock_time.side_effect = lambda: ts + 5
         assert rate_limiter.check_credit(1), 'enough time for new item'
         assert rate_limiter.check_credit(1), 'enough time for second new item'
-        for i in range(0, 8):
+        for _ in range(8):
             assert not rate_limiter.check_credit(1), 'but no further, since time is stopped'
 
     # Test with rate limit of greater than 1 second

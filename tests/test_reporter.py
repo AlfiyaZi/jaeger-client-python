@@ -134,7 +134,7 @@ class ReporterTest(AsyncTestCase):
     def _wait_for(self, fn):
         """Wait until fn() returns truth, but not longer than 1 second."""
         start = time.time()
-        for i in range(1000):
+        for _ in range(1000):
             if fn():
                 return
             yield tornado.gen.sleep(0.001)

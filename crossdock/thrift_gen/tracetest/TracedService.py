@@ -140,23 +140,24 @@ class Client(Iface):
 class Processor(Iface, TProcessor):
   def __init__(self, handler):
     self._handler = handler
-    self._processMap = {}
-    self._processMap["startTrace"] = Processor.process_startTrace
-    self._processMap["joinTrace"] = Processor.process_joinTrace
+    self._processMap = {
+        "startTrace": Processor.process_startTrace,
+        "joinTrace": Processor.process_joinTrace,
+    }
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
-    if name not in self._processMap:
-      iprot.skip(TType.STRUCT)
-      iprot.readMessageEnd()
-      x = TApplicationException(TApplicationException.UNKNOWN_METHOD, 'Unknown function %s' % (name))
-      oprot.writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
-      x.write(oprot)
-      oprot.writeMessageEnd()
-      oprot.trans.flush()
-      return
-    else:
+    if name in self._processMap:
       return self._processMap[name](self, seqid, iprot, oprot)
+
+    iprot.skip(TType.STRUCT)
+    iprot.readMessageEnd()
+    x = TApplicationException(TApplicationException.UNKNOWN_METHOD, 'Unknown function %s' % (name))
+    oprot.writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
+    x.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+    return
 
   @gen.coroutine
   def process_startTrace(self, seqid, iprot, oprot):
@@ -208,12 +209,9 @@ class startTrace_args(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.STRUCT:
-          self.request = StartTraceRequest()
-          self.request.read(iprot)
-        else:
-          iprot.skip(ftype)
+      if fid == 1 and ftype == TType.STRUCT:
+        self.request = StartTraceRequest()
+        self.request.read(iprot)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -273,12 +271,9 @@ class startTrace_result(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 0:
-        if ftype == TType.STRUCT:
-          self.success = TraceResponse()
-          self.success.read(iprot)
-        else:
-          iprot.skip(ftype)
+      if fid == 0 and ftype == TType.STRUCT:
+        self.success = TraceResponse()
+        self.success.read(iprot)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -339,12 +334,9 @@ class joinTrace_args(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.STRUCT:
-          self.request = JoinTraceRequest()
-          self.request.read(iprot)
-        else:
-          iprot.skip(ftype)
+      if fid == 1 and ftype == TType.STRUCT:
+        self.request = JoinTraceRequest()
+        self.request.read(iprot)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -404,12 +396,9 @@ class joinTrace_result(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 0:
-        if ftype == TType.STRUCT:
-          self.success = TraceResponse()
-          self.success.read(iprot)
-        else:
-          iprot.skip(ftype)
+      if fid == 0 and ftype == TType.STRUCT:
+        self.success = TraceResponse()
+        self.success.read(iprot)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
