@@ -650,11 +650,8 @@ class Response(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.BOOL:
-          self.ok = iprot.readBool()
-        else:
-          iprot.skip(ftype)
+      if fid == 1 and ftype == TType.BOOL:
+        self.ok = iprot.readBool()
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()

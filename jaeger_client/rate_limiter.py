@@ -66,5 +66,4 @@ class RateLimiter(object):
         elapsed_time = current_time - self.last_tick
         self.last_tick = current_time
         self.balance += elapsed_time * self.credits_per_second
-        if self.balance > self.max_balance:
-            self.balance = self.max_balance
+        self.balance = min(self.balance, self.max_balance)

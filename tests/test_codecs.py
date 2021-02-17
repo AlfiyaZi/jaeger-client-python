@@ -167,11 +167,11 @@ class TestCodecs(unittest.TestCase):
         with self.assertRaises(InvalidCarrierException):
             codec.extract(carrier=[])  # not a dict
 
-        good_headers_bad_values = {
-            'Trace-ID': '100:7f:0:1xxx',
-            'trace-attr-Kiff': 'Amy'
-        }
         with self.assertRaises(SpanContextCorruptedException):
+            good_headers_bad_values = {
+                'Trace-ID': '100:7f:0:1xxx',
+                'trace-attr-Kiff': 'Amy'
+            }
             codec.extract(good_headers_bad_values)
 
     def test_context_from_readable_headers(self):
@@ -188,19 +188,18 @@ class TestCodecs(unittest.TestCase):
         )
         for url_encoding in [False, True]:
             if url_encoding:
-                codec = tracer.codecs[Format.HTTP_HEADERS]
                 headers = {
                     'Trace-ID': '100%3A7f:0:1',
                     'trace-attr-Kiff': 'Amy%20Wang',
                     'trace-atTR-HERMES': 'LaBarbara%20Hermes'
                 }
             else:
-                codec = tracer.codecs[Format.HTTP_HEADERS]
                 headers = {
                     'Trace-ID': '100:7f:0:1',
                     'trace-attr-Kiff': 'Amy Wang',
                     'trace-atTR-HERMES': 'LaBarbara Hermes'
                 }
+            codec = tracer.codecs[Format.HTTP_HEADERS]
             ctx = codec.extract(headers)
             assert ctx.trace_id == 256
             assert ctx.span_id == 127
@@ -496,7 +495,7 @@ def test_inject_with_128bit_trace_id(tracer, fmt, carrier, get_trace_id):
         ctx = SpanContext(trace_id=(1 << 64) - 1, span_id=127, parent_id=None,
                           flags=0)
         span = tracer.start_span('test-%s' % fmt, child_of=ctx)
-        carrier = dict()
+        carrier = {}
         tracer.inject(span, fmt, carrier)
         assert len(get_trace_id(carrier)) == 16
 

@@ -56,11 +56,8 @@ class ProbabilisticSamplingStrategy(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.DOUBLE:
-          self.samplingRate = iprot.readDouble()
-        else:
-          iprot.skip(ftype)
+      if fid == 1 and ftype == TType.DOUBLE:
+        self.samplingRate = iprot.readDouble()
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -123,11 +120,8 @@ class RateLimitingSamplingStrategy(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.I16:
-          self.maxTracesPerSecond = iprot.readI16()
-        else:
-          iprot.skip(ftype)
+      if fid == 1 and ftype == TType.I16:
+        self.maxTracesPerSecond = iprot.readI16()
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -193,19 +187,13 @@ class OperationSamplingStrategy(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.STRING:
-          self.operation = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.STRUCT:
-          self.probabilisticSampling = ProbabilisticSamplingStrategy()
-          self.probabilisticSampling.read(iprot)
-        else:
-          iprot.skip(ftype)
-      else:
+      if fid == 1 and ftype == TType.STRING:
+        self.operation = iprot.readString()
+      elif ftype != TType.STRUCT or fid != 2:
         iprot.skip(ftype)
+      else:
+        self.probabilisticSampling = ProbabilisticSamplingStrategy()
+        self.probabilisticSampling.read(iprot)
       iprot.readFieldEnd()
     iprot.readStructEnd()
 

@@ -121,9 +121,9 @@ def test_span_logging(tracer):
             expected = {'event': expected}
         return tpl(
             method=method,
-            args=args if args else [],
+            args=args or [],
             expected=expected,
-            kwargs=kwargs if kwargs else {},
+            kwargs=kwargs or {},
             error=error,
             timestamp=timestamp,
         )

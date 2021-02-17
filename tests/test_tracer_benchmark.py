@@ -21,7 +21,7 @@ from jaeger_client.sampler import ConstSampler
 
 
 def _generate_spans(tracer, iterations=1000, sleep=None):
-    for i in range(0, iterations):
+    for _ in range(iterations):
         span = tracer.start_trace(operation_name='root-span')
         span.finish()
         if sleep is not None:

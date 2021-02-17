@@ -193,15 +193,19 @@ def make_ref_type(span_ref_type):
 def make_references(references):
     if not references:
         return None
-    list_of_span_refs = list()
-    for span_ref in references:
-        list_of_span_refs.append(ttypes.SpanRef(
+    return [
+        ttypes.SpanRef(
             refType=make_ref_type(span_ref.type),
-            traceIdLow=id_to_int(_id_to_low(span_ref.referenced_context.trace_id)),
-            traceIdHigh=id_to_int(_id_to_high(span_ref.referenced_context.trace_id)),
+            traceIdLow=id_to_int(
+                _id_to_low(span_ref.referenced_context.trace_id)
+            ),
+            traceIdHigh=id_to_int(
+                _id_to_high(span_ref.referenced_context.trace_id)
+            ),
             spanId=id_to_int(span_ref.referenced_context.span_id),
-        ))
-    return list_of_span_refs
+        )
+        for span_ref in references
+    ]
 
 
 def make_jaeger_batch(spans, process):

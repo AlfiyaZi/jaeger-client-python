@@ -103,22 +103,21 @@ class Client(Iface):
 class Processor(Iface, TProcessor):
   def __init__(self, handler):
     self._handler = handler
-    self._processMap = {}
-    self._processMap["submitZipkinBatch"] = Processor.process_submitZipkinBatch
+    self._processMap = {"submitZipkinBatch": Processor.process_submitZipkinBatch}
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
-    if name not in self._processMap:
-      iprot.skip(TType.STRUCT)
-      iprot.readMessageEnd()
-      x = TApplicationException(TApplicationException.UNKNOWN_METHOD, 'Unknown function %s' % (name))
-      oprot.writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
-      x.write(oprot)
-      oprot.writeMessageEnd()
-      oprot.trans.flush()
-      return
-    else:
+    if name in self._processMap:
       return self._processMap[name](self, seqid, iprot, oprot)
+
+    iprot.skip(TType.STRUCT)
+    iprot.readMessageEnd()
+    x = TApplicationException(TApplicationException.UNKNOWN_METHOD, 'Unknown function %s' % (name))
+    oprot.writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
+    x.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+    return
 
   @gen.coroutine
   def process_submitZipkinBatch(self, seqid, iprot, oprot):
@@ -158,17 +157,14 @@ class submitZipkinBatch_args(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 1:
-        if ftype == TType.LIST:
-          self.spans = []
-          (_etype17, _size14) = iprot.readListBegin()
-          for _i18 in xrange(_size14):
-            _elem19 = Span()
-            _elem19.read(iprot)
-            self.spans.append(_elem19)
-          iprot.readListEnd()
-        else:
-          iprot.skip(ftype)
+      if fid == 1 and ftype == TType.LIST:
+        self.spans = []
+        (_etype17, _size14) = iprot.readListBegin()
+        for _i18 in xrange(_size14):
+          _elem19 = Span()
+          _elem19.read(iprot)
+          self.spans.append(_elem19)
+        iprot.readListEnd()
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -231,17 +227,14 @@ class submitZipkinBatch_result(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 0:
-        if ftype == TType.LIST:
-          self.success = []
-          (_etype24, _size21) = iprot.readListBegin()
-          for _i25 in xrange(_size21):
-            _elem26 = Response()
-            _elem26.read(iprot)
-            self.success.append(_elem26)
-          iprot.readListEnd()
-        else:
-          iprot.skip(ftype)
+      if fid == 0 and ftype == TType.LIST:
+        self.success = []
+        (_etype24, _size21) = iprot.readListBegin()
+        for _i25 in xrange(_size21):
+          _elem26 = Response()
+          _elem26.read(iprot)
+          self.success.append(_elem26)
+        iprot.readListEnd()
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
